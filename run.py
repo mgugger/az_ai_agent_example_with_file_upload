@@ -1,9 +1,21 @@
 from azure.ai.projects import AIProjectClient
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, ClientSecretCredential
 from azure.ai.projects.models import MessageAttachment
 
+
+# Replace these with your actual values
+tenant_id = "<your-tenant-id>"
+client_id = "<your-client-id>"
+client_secret = "<your-client-secret>"
+
+credential = ClientSecretCredential(
+    tenant_id=tenant_id,
+    client_id=client_id,
+    client_secret=client_secret
+)
+
 project_client = AIProjectClient.from_connection_string(
-    credential=DefaultAzureCredential(),
+    credential=ClientSecretCredential(),
     conn_str="<ai_foundry_connection_string>",)
 
 # Use the defined agent ID that has "code_interpreter" capability but without uploaded files
