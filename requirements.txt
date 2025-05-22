@@ -1,2 +1,3 @@
 azure-ai-projects~=1.0.0b7
 azure-identity
+python-dotenv

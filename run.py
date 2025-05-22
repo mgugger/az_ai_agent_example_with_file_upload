@@ -1,25 +1,17 @@
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential, ClientSecretCredential
 from azure.ai.projects.models import MessageAttachment
+from dotenv import load_dotenv
+import os
 
-
-# Replace these with your actual values
-tenant_id = "<your-tenant-id>"
-client_id = "<your-client-id>"
-client_secret = "<your-client-secret>"
-
-credential = ClientSecretCredential(
-    tenant_id=tenant_id,
-    client_id=client_id,
-    client_secret=client_secret
-)
+load_dotenv()
 
 project_client = AIProjectClient.from_connection_string(
-    credential=ClientSecretCredential(),
-    conn_str="<ai_foundry_connection_string>",)
+    credential=DefaultAzureCredential(),
+    conn_str=os.environ['AI_FOUNDRY_CONN_STR'])
 
 # Use the defined agent ID that has "code_interpreter" capability but without uploaded files
-agent = project_client.agents.get_agent("agent_id_with_code_interpreter")
+agent = project_client.agents.get_agent(os.environ['AI_AGENT_ID'])
 
 # Create a new thread (or possibly reuse an existing one)
 thread = project_client.agents.create_thread(
@@ -30,7 +22,7 @@ thread = project_client.agents.create_thread(
 )
 
 # Create a file to attach to the message
-file_path = "<path_to_excel_file>"
+file_path = "./data.csv"
 uploaded_file = project_client.agents.upload_file(file_path=file_path, purpose="assistants")
 attachment = MessageAttachment(
     file_id=uploaded_file.id,
@@ -41,8 +33,7 @@ attachment = MessageAttachment(
 message = project_client.agents.create_message(
     thread_id=thread.id,
     role="user",
-    content="""Generate me the paid gross loss based on the data of the provided excel file as of in the first sheet on france-data*. 
-    Visualize the data in a chart.""",
+    content="""Generate me the paid gross loss per country based on the data provided in the data.csv file.""",
     attachments=[attachment]
 )
 
